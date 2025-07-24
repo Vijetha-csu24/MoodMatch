@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Moodmatch</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to bottom right, #0f0c29, #302b63, #24243e);
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+
+    h1 {
+      font-size: 2.2rem;
+      margin: 1rem 0 0.3rem;
+    }
+
+    p.tagline {
+      font-size: 0.9rem;
+      color: #ccc;
+      margin-bottom: 2rem;
+    }
+
+    .input-box {
+      margin-bottom: 1rem;
+    }
+
+    textarea, input[type=text] {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      margin-top: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3e8e41;
+    }
+
+    .results {
+      margin-top: 2rem;
+      text-align: left;
+    }
+
+    .results h2, .results h3 {
+      color: #f4f4f4;
+    }
+
+    .suggestion-list, .place-cards {
+      list-style-type: none;
+      padding-left: 0;
+    }
+
+    .place-card {
+      background-color: #1f1f2e;
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .place-card a {
+      color: #4da6ff;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 1.05rem;
+    }
+
+    .place-card p {
+      margin: 0.5rem 0 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Moodmatch</h1>
+    <p class="tagline">Do better. Feel better.</p>
+
+    <div class="input-box">
+      <label for="mood">Mood</label>
+      <textarea id="mood" rows="2" placeholder="e.g. I feel low and tired..."></textarea>
+    </div>
+
+    <div class="input-box">
+      <label for="location">Location</label>
+      <input type="text" id="location" placeholder="e.g. Cleveland or 40.7,-73.9" />
+    </div>
+
+    <button onclick="getMood()">Discover Now</button>
+
+    <div class="results" id="results" style="display: none;">
+      <h2>Your Mood: <span id="predictedMood"></span></h2>
+
+      <div>
+        <h3>Suggestions</h3>
+        <ul class="suggestion-list" id="suggestionsList"></ul>
+      </div>
+
+      <div>
+        <h3>Activities Nearby</h3>
+        <div class="place-cards" id="placesLinks"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function getMood() {
+      const text = document.getElementById("mood").value.trim();
+      const city = document.getElementById("location").value.trim();
+      if (!text) return alert("Please enter how you're feeling.");
+
+      const response = await fetch("https://6c025374-f7ad-4605-aa81-f1713f43f9fb-00-ebb7xzk88wjx.kirk.replit.dev/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, city })
+      });
+
+      if (!response.ok) return alert("Something went wrong. Try again!");
+
+      const data = await response.json();
+
+      document.getElementById("predictedMood").innerText = data.predicted_mood;
+
+      // Suggestions
+      const suggestionsList = document.getElementById("suggestionsList");
+      suggestionsList.innerHTML = "";
+      data.suggestions.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        suggestionsList.appendChild(li);
+      });
+
+      // Places
+      const places = document.getElementById("placesLinks");
+      places.innerHTML = data.places_links && data.places_links.length
+        ? data.places_links.map(p => `
+            <div class="place-card">
+              <a href="${p.url}" target="_blank">📍 ${p.name}</a>
+              <p>${p.address}</p>
+            </div>
+          `).join('')
+        : "<p>No local places found.</p>";
+
+      document.getElementById("results").style.display = "block";
+    }
+  </script>
+</body>
+</html>
