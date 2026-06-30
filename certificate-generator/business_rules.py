@@ -221,25 +221,32 @@ def _match_field(field_norm, normalized_excel):
 
 def auto_match_columns(excel_columns, placeholders):
     """
-    Auto-match Excel column names to template placeholder names.
+    Auto-match Excel column names to internal field names.
 
-    Returns dict: {placeholder_name: excel_column_name}
+    Returns dict: {internal_field_name: excel_column_name}
     Computed fields (name, expiration_date) are marked with "__computed__".
-    Also matches required source fields (first_name, last_name, etc.)
-    even when they aren't direct template placeholders.
+
+    Template placeholders are resolved to their internal field names
+    via the alias system (e.g. FName -> first_name, Certno -> cert_number).
     """
     matches = {}
     normalized_excel = {normalize_column_name(c): c for c in excel_columns}
 
-    all_fields = set(placeholders) | REQUIRED_SOURCE_FIELDS
-    for ph in all_fields:
+    all_fields = set(REQUIRED_SOURCE_FIELDS)
+    for ph in placeholders:
         ph_norm = normalize_column_name(ph)
         if ph_norm in COMPUTED_FIELDS:
             matches[ph] = "__computed__"
         else:
-            found = _match_field(ph_norm, normalized_excel)
-            if found:
-                matches[ph] = found
+            resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+            all_fields.add(resolved)
+
+    for field in all_fields:
+        if field in matches:
+            continue
+        found = _match_field(field, normalized_excel)
+        if found:
+            matches[field] = found
 
     return matches
 

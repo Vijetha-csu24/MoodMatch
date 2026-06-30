@@ -171,8 +171,8 @@ def generate():
     rows = df.to_dict("records")
 
     config = CERT_TYPES[cert_type_key]
-    required_placeholders = extract_placeholders_from_docx(str(template_path))
-    is_valid, errors = validate_data(rows, cert_type_key, required_placeholders)
+    template_placeholders = extract_placeholders_from_docx(str(template_path))
+    is_valid, errors = validate_data(rows, cert_type_key, template_placeholders)
     if not is_valid:
         return jsonify({"error": "Data validation failed", "details": errors[:20]}), 400
 
@@ -199,7 +199,13 @@ def generate():
                 filename = f"{name_part}_{counter}.docx"
                 counter += 1
 
-            doc_bytes = render_placeholders(fixed_template_bytes, context)
+            render_context = dict(context)
+            if column_mapping:
+                for internal_name, excel_col in column_mapping.items():
+                    if internal_name in context:
+                        render_context[excel_col] = context[internal_name]
+
+            doc_bytes = render_placeholders(fixed_template_bytes, render_context)
 
             protected_bytes = apply_document_protection(doc_bytes)
 
