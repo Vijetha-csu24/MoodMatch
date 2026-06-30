@@ -16,7 +16,7 @@ body {
     background: #fff;
     border-bottom: 1px solid #e2e8f0;
     padding: 0 32px;
-    height: 60px;
+    height: 88px;
     display: flex;
     align-items: center;
     position: sticky;
@@ -34,7 +34,7 @@ body {
 }
 
 .logo img {
-    height: 32px;
+    height: 72px;
     display: block;
 }
 
