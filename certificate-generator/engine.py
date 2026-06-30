@@ -56,8 +56,33 @@ def fix_fragmented_placeholders(docx_bytes):
         with zipfile.ZipFile(buffer_out, "w", zipfile.ZIP_DEFLATED) as zout:
             for item in zin.infolist():
                 data = zin.read(item.filename)
-                if item.filename == "word/document.xml":
+                if item.filename.startswith("word/") and item.filename.endswith(".xml"):
                     data = _fix_xml(data)
+                zout.writestr(item, data)
+
+    return buffer_out.getvalue()
+
+
+def post_render_replace(docx_bytes, context):
+    """
+    Fallback replacement for any {{placeholder}} that docxtpl missed.
+
+    Some placeholders inside textboxes (especially in mc:Fallback VML blocks)
+    may survive docxtpl's Jinja rendering. This does a direct string replacement
+    on all XML parts in the docx.
+    """
+    buffer_in = io.BytesIO(docx_bytes)
+    buffer_out = io.BytesIO()
+
+    with zipfile.ZipFile(buffer_in, "r") as zin:
+        with zipfile.ZipFile(buffer_out, "w", zipfile.ZIP_DEFLATED) as zout:
+            for item in zin.infolist():
+                data = zin.read(item.filename)
+                if item.filename.endswith(".xml"):
+                    text = data.decode("utf-8")
+                    for key, value in context.items():
+                        text = text.replace("{{" + key + "}}", str(value))
+                    data = text.encode("utf-8")
                 zout.writestr(item, data)
 
     return buffer_out.getvalue()
