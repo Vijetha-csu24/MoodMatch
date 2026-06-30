@@ -155,18 +155,20 @@ def _try_merge_run_group(parent, runs, skipped=None):
 
     placeholders_found = re.findall(r"\{\{[\w]+\}\}", combined)
     if not placeholders_found:
-        individual_has_all = all(
-            re.search(r"\{\{[\w]+\}\}", t) for t in texts if "{{" in t
-        )
-        if individual_has_all:
-            return
-
-    fragments = _find_fragment_spans(texts)
-    if not fragments:
         return
 
-    for start_idx, end_idx in reversed(fragments):
-        _merge_runs(parent, runs, start_idx, end_idx, skipped)
+    all_intact = all(
+        any(ph in t for t in texts) for ph in placeholders_found
+    )
+    if all_intact:
+        return
+
+    fragments = _find_fragment_spans(texts)
+    if fragments:
+        for start_idx, end_idx in reversed(fragments):
+            _merge_runs(parent, runs, start_idx, end_idx, skipped)
+    else:
+        _merge_runs(parent, runs, 0, len(runs) - 1, skipped)
 
 
 def _find_fragment_spans(texts):
