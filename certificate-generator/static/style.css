@@ -1,0 +1,352 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #f0f2f5;
+    color: #1a1a2e;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    font-size: 15px;
+    color: #666;
+}
+
+.step {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    transition: opacity 0.3s;
+}
+
+.step.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.step.completed {
+    border-left: 4px solid #22c55e;
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #1a1a2e;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.step.completed .step-number {
+    background: #22c55e;
+}
+
+.step-header h2 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.step-body {
+    padding-left: 44px;
+}
+
+select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #fff;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+}
+
+select:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.hint {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 12px;
+}
+
+.hint code {
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: #e11d48;
+}
+
+.upload-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.upload-btn {
+    padding: 10px 20px;
+    background: #1a1a2e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.upload-btn:hover {
+    background: #2d2d4e;
+}
+
+.filename {
+    font-size: 14px;
+    color: #666;
+}
+
+.info-box {
+    margin-top: 12px;
+    padding: 12px 16px;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e40af;
+    line-height: 1.5;
+}
+
+.result-box {
+    margin-top: 16px;
+    padding: 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.result-box h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.placeholder-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.placeholder-tag {
+    background: #dbeafe;
+    color: #1e40af;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.mapping-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.mapping-table th,
+.mapping-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mapping-table th {
+    font-weight: 600;
+    color: #666;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.match-status {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.match-status.matched {
+    color: #22c55e;
+}
+
+.match-status.unmatched {
+    color: #ef4444;
+}
+
+.summary-box {
+    padding: 16px;
+    background: #f0fdf4;
+    border-radius: 8px;
+    border: 1px solid #bbf7d0;
+    margin-bottom: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.generate-btn {
+    width: 100%;
+    padding: 14px;
+    background: #22c55e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.generate-btn:hover {
+    background: #16a34a;
+}
+
+.generate-btn:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+.progress-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #666;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.download-btn {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 14px 28px;
+    background: #3b82f6;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.download-btn:hover {
+    background: #2563eb;
+}
+
+.error-banner {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    color: #dc2626;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    max-width: 600px;
+    z-index: 100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.error-details {
+    margin-top: 8px;
+    font-size: 12px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.cert-count {
+    font-size: 24px;
+    font-weight: 700;
+    color: #22c55e;
+}
+
+.generated-list {
+    list-style: none;
+    margin-top: 12px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.generated-list li {
+    padding: 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    color: #444;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 12px;
+    }
+
+    .step-body {
+        padding-left: 0;
+    }
+
+    header h1 {
+        font-size: 22px;
+    }
+}

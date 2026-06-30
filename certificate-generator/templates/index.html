@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StunTronics Certificate Generator</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>StunTronics Certificate Generator</h1>
+            <p class="subtitle">Upload a Word template and Excel data to generate certificates</p>
+        </header>
+
+        <!-- Step 1: Select Certificate Type -->
+        <section class="step" id="step-1">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2>Select Certificate Type</h2>
+            </div>
+            <div class="step-body">
+                <select id="cert-type-select">
+                    <option value="">-- Choose certificate type --</option>
+                    {% for key, config in cert_types.items() %}
+                    <option value="{{ key }}">{{ config.label }}</option>
+                    {% endfor %}
+                </select>
+                <div id="cert-type-info" class="info-box hidden"></div>
+            </div>
+        </section>
+
+        <!-- Step 2: Upload Template -->
+        <section class="step disabled" id="step-2">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2>Upload Word Template</h2>
+            </div>
+            <div class="step-body">
+                <p class="hint">Upload a .docx file with placeholders like <code>{{first_name}}</code>, <code>{{cert_number}}</code>, etc.</p>
+                <div class="upload-area" id="template-upload-area">
+                    <input type="file" id="template-file" accept=".docx" hidden>
+                    <button class="upload-btn" onclick="document.getElementById('template-file').click()">
+                        Choose Template File
+                    </button>
+                    <span id="template-filename" class="filename"></span>
+                </div>
+                <div id="placeholders-result" class="result-box hidden"></div>
+            </div>
+        </section>
+
+        <!-- Step 3: Upload Data -->
+        <section class="step disabled" id="step-3">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2>Upload Excel Data</h2>
+            </div>
+            <div class="step-body">
+                <p class="hint">Upload an .xlsx file with one row per certificate. Column names should match the placeholders.</p>
+                <div class="upload-area" id="data-upload-area">
+                    <input type="file" id="data-file" accept=".xlsx,.xls,.csv" hidden>
+                    <button class="upload-btn" onclick="document.getElementById('data-file').click()">
+                        Choose Data File
+                    </button>
+                    <span id="data-filename" class="filename"></span>
+                </div>
+                <div id="mapping-result" class="result-box hidden"></div>
+            </div>
+        </section>
+
+        <!-- Step 4: Generate -->
+        <section class="step disabled" id="step-4">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2>Generate Certificates</h2>
+            </div>
+            <div class="step-body">
+                <div id="summary" class="summary-box"></div>
+                <button id="generate-btn" class="generate-btn" onclick="generateCertificates()">
+                    Generate Certificates
+                </button>
+                <div id="progress" class="progress-box hidden">
+                    <div class="spinner"></div>
+                    <span>Generating certificates...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Step 5: Download -->
+        <section class="step disabled" id="step-5">
+            <div class="step-header">
+                <span class="step-number">5</span>
+                <h2>Download</h2>
+            </div>
+            <div class="step-body">
+                <div id="generation-result" class="result-box"></div>
+                <a id="download-link" class="download-btn hidden" href="#">
+                    Download Certificates (ZIP)
+                </a>
+            </div>
+        </section>
+
+        <!-- Error Display -->
+        <div id="error-banner" class="error-banner hidden"></div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
