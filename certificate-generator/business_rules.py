@@ -199,6 +199,8 @@ COLUMN_ALIASES = {
     "award_date": ["date", "awarddate", "award", "cert_date", "certdate", "training_date", "trainingdate"],
     "cert_number": ["certno", "certnumber", "cert_no", "cert_num", "certnum", "certificate_number", "certificatenumber", "number", "no"],
     "instructor_name": ["instructor", "instructorname", "trainer", "trainer_name"],
+    "expiration_date": ["edate", "exp_date", "expdate", "expiry", "expiry_date"],
+    "name": ["fullname", "full_name", "candidate_name", "student_name"],
 }
 
 _ALIAS_LOOKUP = {}

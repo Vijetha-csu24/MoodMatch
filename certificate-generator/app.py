@@ -27,6 +27,8 @@ from business_rules import (
     auto_match_columns,
     normalize_column_name,
     validate_data,
+    format_award_date,
+    format_expiration_date,
 )
 
 app = Flask(__name__, template_folder="templates", static_folder="static")
@@ -38,6 +40,24 @@ OUTPUT_DIR.mkdir(exist_ok=True)
 
 MAX_CONTENT_LENGTH = 50 * 1024 * 1024
 app.config["MAX_CONTENT_LENGTH"] = MAX_CONTENT_LENGTH
+
+
+def _check_direct_mode(template_placeholders, normalized_excel):
+    """
+    Check if all template placeholders can be satisfied directly by Excel columns.
+    If so, bypass business rules and do direct replacement.
+    """
+    for ph in template_placeholders:
+        ph_norm = normalize_column_name(ph)
+        if ph_norm in normalized_excel:
+            continue
+        resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+        if resolved in normalized_excel:
+            continue
+        if ph_norm in COMPUTED_FIELDS:
+            return False
+        return False
+    return True
 
 
 @app.route("/")
@@ -177,19 +197,39 @@ def generate():
     except Exception as e:
         return jsonify({"error": f"Failed to read data: {str(e)}"}), 400
 
-    if column_mapping:
-        reverse_map = {v: k for k, v in column_mapping.items()}
-        df = df.rename(columns=reverse_map)
-    else:
-        df.columns = [normalize_column_name(c) for c in df.columns]
-
-    rows = df.to_dict("records")
-
-    config = CERT_TYPES[cert_type_key]
     template_placeholders = extract_placeholders_from_docx(str(template_path))
-    is_valid, errors = validate_data(rows, cert_type_key, template_placeholders)
-    if not is_valid:
-        return jsonify({"error": "Data validation failed", "details": errors[:20]}), 400
+    excel_columns = list(df.columns)
+    normalized_excel = {normalize_column_name(c): c for c in excel_columns}
+
+    direct_mode = _check_direct_mode(template_placeholders, normalized_excel)
+
+    if direct_mode:
+        rows = df.to_dict("records")
+        placeholder_to_col = {}
+        for ph in template_placeholders:
+            ph_norm = normalize_column_name(ph)
+            if ph_norm in normalized_excel:
+                placeholder_to_col[ph] = normalized_excel[ph_norm]
+            else:
+                resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+                if resolved in normalized_excel:
+                    placeholder_to_col[ph] = normalized_excel[resolved]
+
+        missing = [ph for ph in template_placeholders if ph not in placeholder_to_col]
+        if missing:
+            return jsonify({"error": f"No matching Excel columns for: {', '.join(missing)}"}), 400
+    else:
+        if column_mapping:
+            reverse_map = {v: k for k, v in column_mapping.items()}
+            df = df.rename(columns=reverse_map)
+        else:
+            df.columns = [normalize_column_name(c) for c in df.columns]
+
+        rows = df.to_dict("records")
+        config = CERT_TYPES[cert_type_key]
+        is_valid, errors = validate_data(rows, cert_type_key, template_placeholders)
+        if not is_valid:
+            return jsonify({"error": "Data validation failed", "details": errors[:20]}), 400
 
     with open(template_path, "rb") as f:
         template_bytes = f.read()
@@ -204,8 +244,57 @@ def generate():
 
     for i, row in enumerate(rows):
         try:
-            context = build_context(row, cert_type_key)
-            filename = build_filename(row["first_name"], row["last_name"], cert_type_key)
+            if direct_mode:
+                render_context = {}
+                for ph, col in placeholder_to_col.items():
+                    val = row.get(col, "")
+                    if val is None:
+                        render_context[ph] = ""
+                        continue
+                    val_str = str(val).strip()
+                    ph_norm = normalize_column_name(ph)
+                    resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+                    if resolved == "award_date":
+                        try:
+                            render_context[ph] = format_award_date(val)
+                        except (ValueError, TypeError):
+                            render_context[ph] = val_str
+                    elif resolved == "expiration_date":
+                        try:
+                            render_context[ph] = format_expiration_date(val)
+                        except (ValueError, TypeError):
+                            render_context[ph] = val_str
+                    else:
+                        render_context[ph] = val_str
+
+                name_val = render_context.get("Name") or render_context.get("name") or ""
+                parts = name_val.strip().split()
+                if len(parts) >= 2:
+                    first, last = parts[0], parts[-1]
+                else:
+                    first, last = name_val, str(i + 1)
+                cert_num = render_context.get("Certno") or render_context.get("cert_number") or ""
+                filename = build_filename(first, last, cert_type_key)
+            else:
+                context = build_context(row, cert_type_key)
+                filename = build_filename(row["first_name"], row["last_name"], cert_type_key)
+
+                render_context = dict(context)
+                if column_mapping:
+                    for internal_name, excel_col in column_mapping.items():
+                        if internal_name in context:
+                            render_context[excel_col] = context[internal_name]
+
+                for ph in template_placeholders:
+                    if ph in render_context:
+                        continue
+                    ph_norm = normalize_column_name(ph)
+                    resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+                    if resolved in context:
+                        render_context[ph] = context[resolved]
+
+                name_val = context.get("name", "")
+                cert_num = context.get("cert_number", "")
 
             counter = 1
             original_filename = filename
@@ -213,20 +302,6 @@ def generate():
                 name_part = original_filename.rsplit(".", 1)[0]
                 filename = f"{name_part}_{counter}.docx"
                 counter += 1
-
-            render_context = dict(context)
-            if column_mapping:
-                for internal_name, excel_col in column_mapping.items():
-                    if internal_name in context:
-                        render_context[excel_col] = context[internal_name]
-
-            for ph in template_placeholders:
-                if ph in render_context:
-                    continue
-                ph_norm = normalize_column_name(ph)
-                resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
-                if resolved in context:
-                    render_context[ph] = context[resolved]
 
             doc_bytes = render_and_protect(fixed_template_bytes, render_context)
 
@@ -236,9 +311,8 @@ def generate():
 
             generated.append({
                 "filename": filename,
-                "name": context.get("name", ""),
-                "cert_number": context.get("cert_number", ""),
-                "award_date": context.get("award_date", ""),
+                "name": name_val,
+                "cert_number": cert_num,
             })
 
         except Exception as e:
