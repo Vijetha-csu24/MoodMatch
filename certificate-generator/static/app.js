@@ -273,10 +273,26 @@ function disableStepsFrom(n) {
         const dot = document.getElementById(`dot-${i}`);
         if (dot) {
             dot.classList.remove("active", "completed");
+            dot.innerHTML = i;
         }
         const line = document.getElementById(`line-${i - 1}`);
         if (line) line.classList.remove("completed");
     }
+    const resultBoxes = ["placeholders-result", "mapping-result", "generation-result"];
+    for (const id of resultBoxes) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.innerHTML = "";
+            el.classList.add("hidden");
+        }
+    }
+    const downloadLink = document.getElementById("download-link");
+    if (downloadLink) {
+        downloadLink.classList.add("hidden");
+        downloadLink.href = "#";
+    }
+    const summary = document.getElementById("summary");
+    if (summary) summary.innerHTML = "";
 }
 
 function markCompleted(n) {

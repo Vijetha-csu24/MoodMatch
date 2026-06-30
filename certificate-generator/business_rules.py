@@ -132,8 +132,9 @@ def build_filename(first_name, last_name, cert_type_key):
     Examples: LOWERY_S_SH.docx, MALDONADO_P_INSTR_SH.docx
     """
     config = CERT_TYPES[cert_type_key]
-    last = str(last_name).strip().upper()
-    first_init = str(first_name).strip()[0].upper()
+    last = str(last_name).strip().upper() or "UNKNOWN"
+    first_str = str(first_name).strip().upper() or "X"
+    first_init = first_str[0]
     suffix = config["suffix"]
 
     if config["has_expiration"]:
