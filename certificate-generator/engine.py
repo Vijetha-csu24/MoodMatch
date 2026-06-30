@@ -27,6 +27,14 @@ PLACEHOLDER_RE = re.compile(r"\{\{[\w]+\}\}")
 PARTIAL_OPEN = re.compile(r"\{\{?$")
 PARTIAL_CLOSE = re.compile(r"^[\w]*\}?\}?")
 
+SKIP_TAGS = {
+    f"{{{WORD_NS}}}proofErr",
+    f"{{{WORD_NS}}}permStart",
+    f"{{{WORD_NS}}}permEnd",
+    f"{{{WORD_NS}}}bookmarkStart",
+    f"{{{WORD_NS}}}bookmarkEnd",
+}
+
 
 def extract_placeholders_from_docx(docx_path):
     """Extract all {{placeholder}} names from a .docx file, including textboxes."""
@@ -120,6 +128,9 @@ def _merge_fragmented_runs(element):
     """
     Walk the XML tree and merge adjacent <w:r> runs that together form
     a {{placeholder}} but are individually fragmented.
+
+    Skips non-content marker elements (proofErr, permStart, bookmarkStart, etc.)
+    that Word inserts between runs without breaking the run group.
     """
     for parent in element.iter():
         children = list(parent)
@@ -127,24 +138,30 @@ def _merge_fragmented_runs(element):
             continue
 
         runs = []
+        skipped = []
         for child in children:
             if child.tag == R_TAG:
                 runs.append(child)
+            elif child.tag in SKIP_TAGS:
+                if runs:
+                    skipped.append(child)
             else:
                 if runs:
-                    _try_merge_run_group(parent, runs)
+                    _try_merge_run_group(parent, runs, skipped)
                     runs = []
+                    skipped = []
                 _merge_fragmented_runs(child)
 
         if runs:
-            _try_merge_run_group(parent, runs)
+            _try_merge_run_group(parent, runs, skipped)
 
 
-def _try_merge_run_group(parent, runs):
+def _try_merge_run_group(parent, runs, skipped=None):
     """
     Given a sequence of adjacent <w:r> elements, check if their combined
     text contains fragmented placeholders and merge them.
     """
+    skipped = skipped or []
     texts = []
     for r in runs:
         t_el = r.find(T_TAG)
@@ -168,7 +185,7 @@ def _try_merge_run_group(parent, runs):
         return
 
     for start_idx, end_idx in reversed(fragments):
-        _merge_runs(parent, runs, start_idx, end_idx)
+        _merge_runs(parent, runs, start_idx, end_idx, skipped)
 
 
 def _find_fragment_spans(texts):
@@ -195,8 +212,9 @@ def _find_fragment_spans(texts):
     return spans
 
 
-def _merge_runs(parent, runs, start_idx, end_idx):
+def _merge_runs(parent, runs, start_idx, end_idx, skipped=None):
     """Merge runs[start_idx..end_idx] into a single run, preserving first run's formatting."""
+    skipped = skipped or []
     combined_text = ""
     for k in range(start_idx, end_idx + 1):
         t_el = runs[k].find(T_TAG)
@@ -212,6 +230,12 @@ def _merge_runs(parent, runs, start_idx, end_idx):
 
     for k in range(start_idx + 1, end_idx + 1):
         parent.remove(runs[k])
+
+    for el in skipped:
+        try:
+            parent.remove(el)
+        except ValueError:
+            pass
 
 
 XML_SPACE = "http://www.w3.org/XML/1998/namespace"
