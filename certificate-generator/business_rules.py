@@ -207,28 +207,39 @@ for _placeholder, _aliases in COLUMN_ALIASES.items():
         _ALIAS_LOOKUP[_alias] = _placeholder
 
 
+REQUIRED_SOURCE_FIELDS = {"first_name", "last_name", "award_date", "cert_number", "instructor_name"}
+
+
+def _match_field(field_norm, normalized_excel):
+    if field_norm in normalized_excel:
+        return normalized_excel[field_norm]
+    for excel_norm, excel_orig in normalized_excel.items():
+        if _ALIAS_LOOKUP.get(excel_norm) == field_norm:
+            return excel_orig
+    return None
+
+
 def auto_match_columns(excel_columns, placeholders):
     """
     Auto-match Excel column names to template placeholder names.
 
     Returns dict: {placeholder_name: excel_column_name}
     Computed fields (name, expiration_date) are marked with "__computed__".
+    Also matches required source fields (first_name, last_name, etc.)
+    even when they aren't direct template placeholders.
     """
     matches = {}
     normalized_excel = {normalize_column_name(c): c for c in excel_columns}
 
-    for ph in placeholders:
+    all_fields = set(placeholders) | REQUIRED_SOURCE_FIELDS
+    for ph in all_fields:
         ph_norm = normalize_column_name(ph)
         if ph_norm in COMPUTED_FIELDS:
             matches[ph] = "__computed__"
-        elif ph_norm in normalized_excel:
-            matches[ph] = normalized_excel[ph_norm]
         else:
-            for excel_norm, excel_orig in normalized_excel.items():
-                resolved = _ALIAS_LOOKUP.get(excel_norm)
-                if resolved == ph_norm:
-                    matches[ph] = excel_orig
-                    break
+            found = _match_field(ph_norm, normalized_excel)
+            if found:
+                matches[ph] = found
 
     return matches
 
