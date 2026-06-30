@@ -63,13 +63,12 @@ def fix_fragmented_placeholders(docx_bytes):
     return buffer_out.getvalue()
 
 
-def post_render_replace(docx_bytes, context):
+def render_placeholders(docx_bytes, context):
     """
-    Fallback replacement for any {{placeholder}} that docxtpl missed.
+    Replace {{placeholder}} tags directly in all XML parts of the docx.
 
-    Some placeholders inside textboxes (especially in mc:Fallback VML blocks)
-    may survive docxtpl's Jinja rendering. This does a direct string replacement
-    on all XML parts in the docx.
+    More reliable than docxtpl for templates with textboxes, as it works
+    on the raw XML after fragmentation has been fixed.
     """
     buffer_in = io.BytesIO(docx_bytes)
     buffer_out = io.BytesIO()

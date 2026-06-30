@@ -15,9 +15,9 @@ from pathlib import Path
 
 import pandas as pd
 from flask import Flask, request, jsonify, send_file, render_template
-from docxtpl import DocxTemplate
 
-from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, apply_document_protection, post_render_replace
+
+from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, apply_document_protection, render_placeholders
 from business_rules import (
     CERT_TYPES,
     build_context,
@@ -199,14 +199,7 @@ def generate():
                 filename = f"{name_part}_{counter}.docx"
                 counter += 1
 
-            doc = DocxTemplate(io.BytesIO(fixed_template_bytes))
-            doc.render(context)
-
-            doc_buffer = io.BytesIO()
-            doc.save(doc_buffer)
-            doc_bytes = doc_buffer.getvalue()
-
-            doc_bytes = post_render_replace(doc_bytes, context)
+            doc_bytes = render_placeholders(fixed_template_bytes, context)
 
             protected_bytes = apply_document_protection(doc_bytes)
 
