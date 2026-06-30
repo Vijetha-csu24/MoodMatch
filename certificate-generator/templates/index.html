@@ -8,158 +8,114 @@
 </head>
 <body>
 
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <div class="navbar-logo">ST</div>
-            <div>
-                <div class="navbar-title">StunTronics</div>
-                <div class="navbar-subtitle">Training Division</div>
-            </div>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <img src="/static/logo.png" alt="StunTronics LLC">
+            </a>
+            <span class="header-label">Certificate Generator</span>
         </div>
-        <span class="navbar-badge">Certificate Generator v1</span>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <h1>Certificate Generator</h1>
-        <p>Generate professional training certificates from Word templates and Excel data in seconds.</p>
-        <div class="hero-stats">
-            <div class="hero-stat">
-                <div class="hero-stat-value">7</div>
-                <div class="hero-stat-label">Cert Types</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">50+</div>
-                <div class="hero-stat-label">Per Batch</div>
-            </div>
-            <div class="hero-stat">
-                <div class="hero-stat-value">Auto</div>
-                <div class="hero-stat-label">Protected</div>
-            </div>
-        </div>
-    </section>
+    <main class="container">
 
-    <!-- Main Content -->
-    <div class="main-content">
-
-        <!-- Progress Tracker -->
-        <div class="progress-tracker">
-            <div class="progress-step-indicator">
-                <div class="progress-dot active" id="dot-1">1</div>
-            </div>
-            <div class="progress-line" id="line-1"></div>
-            <div class="progress-step-indicator">
-                <div class="progress-dot" id="dot-2">2</div>
-            </div>
-            <div class="progress-line" id="line-2"></div>
-            <div class="progress-step-indicator">
-                <div class="progress-dot" id="dot-3">3</div>
-            </div>
-            <div class="progress-line" id="line-3"></div>
-            <div class="progress-step-indicator">
-                <div class="progress-dot" id="dot-4">4</div>
-            </div>
-            <div class="progress-line" id="line-4"></div>
-            <div class="progress-step-indicator">
-                <div class="progress-dot" id="dot-5">5</div>
-            </div>
+        <!-- Progress -->
+        <div class="progress-bar">
+            <div class="prog-step active" id="dot-1"><span>1</span></div>
+            <div class="prog-line" id="line-1"></div>
+            <div class="prog-step" id="dot-2"><span>2</span></div>
+            <div class="prog-line" id="line-2"></div>
+            <div class="prog-step" id="dot-3"><span>3</span></div>
+            <div class="prog-line" id="line-3"></div>
+            <div class="prog-step" id="dot-4"><span>4</span></div>
+            <div class="prog-line" id="line-4"></div>
+            <div class="prog-step" id="dot-5"><span>5</span></div>
         </div>
 
-        <!-- Step 1: Select Certificate Type -->
-        <section class="step" id="step-1">
-            <div class="step-header">
-                <span class="step-number">1</span>
+        <!-- Step 1 -->
+        <section class="card" id="step-1">
+            <div class="card-header">
+                <div class="step-badge">1</div>
                 <h2>Select Certificate Type</h2>
             </div>
-            <div class="step-body">
+            <div class="card-body">
                 <select id="cert-type-select">
-                    <option value="">-- Choose certificate type --</option>
+                    <option value="">Choose certificate type...</option>
                     {% for key, config in cert_types.items() %}
                     <option value="{{ key }}">{{ config.label }}</option>
                     {% endfor %}
                 </select>
-                <div id="cert-type-info" class="info-box hidden"></div>
+                <div id="cert-type-info" class="notice hidden"></div>
             </div>
         </section>
 
-        <!-- Step 2: Upload Template -->
-        <section class="step disabled" id="step-2">
-            <div class="step-header">
-                <span class="step-number">2</span>
+        <!-- Step 2 -->
+        <section class="card disabled" id="step-2">
+            <div class="card-header">
+                <div class="step-badge">2</div>
                 <h2>Upload Word Template</h2>
             </div>
-            <div class="step-body">
-                <p class="hint">Upload a <code>.docx</code> file with placeholders like <code>{{first_name}}</code>, <code>{{cert_number}}</code>, <code>{{award_date}}</code></p>
-                <div class="upload-area" id="template-upload-area">
+            <div class="card-body">
+                <p class="muted">Upload a <code>.docx</code> file with placeholders like <code>&#123;&#123;first_name&#125;&#125;</code>, <code>&#123;&#123;cert_number&#125;&#125;</code>, <code>&#123;&#123;award_date&#125;&#125;</code></p>
+                <div class="file-row" id="template-upload-area">
                     <input type="file" id="template-file" accept=".docx" hidden>
-                    <button class="upload-btn" onclick="document.getElementById('template-file').click()">
-                        Choose Template
-                    </button>
-                    <span id="template-filename" class="filename"></span>
+                    <button class="btn btn-primary" onclick="document.getElementById('template-file').click()">Choose Template</button>
+                    <span id="template-filename" class="file-name"></span>
                 </div>
-                <div id="placeholders-result" class="result-box hidden"></div>
+                <div id="placeholders-result" class="result hidden"></div>
             </div>
         </section>
 
-        <!-- Step 3: Upload Data -->
-        <section class="step disabled" id="step-3">
-            <div class="step-header">
-                <span class="step-number">3</span>
+        <!-- Step 3 -->
+        <section class="card disabled" id="step-3">
+            <div class="card-header">
+                <div class="step-badge">3</div>
                 <h2>Upload Excel Data</h2>
             </div>
-            <div class="step-body">
-                <p class="hint">Upload an <code>.xlsx</code> file with one row per certificate. Column names will be auto-matched to template placeholders.</p>
-                <div class="upload-area" id="data-upload-area">
+            <div class="card-body">
+                <p class="muted">Upload an <code>.xlsx</code> file with one row per certificate. Columns will be auto-matched to placeholders.</p>
+                <div class="file-row" id="data-upload-area">
                     <input type="file" id="data-file" accept=".xlsx,.xls,.csv" hidden>
-                    <button class="upload-btn" onclick="document.getElementById('data-file').click()">
-                        Choose Data File
-                    </button>
-                    <span id="data-filename" class="filename"></span>
+                    <button class="btn btn-primary" onclick="document.getElementById('data-file').click()">Choose Data File</button>
+                    <span id="data-filename" class="file-name"></span>
                 </div>
-                <div id="mapping-result" class="result-box hidden"></div>
+                <div id="mapping-result" class="result hidden"></div>
             </div>
         </section>
 
-        <!-- Step 4: Generate -->
-        <section class="step disabled" id="step-4">
-            <div class="step-header">
-                <span class="step-number">4</span>
+        <!-- Step 4 -->
+        <section class="card disabled" id="step-4">
+            <div class="card-header">
+                <div class="step-badge">4</div>
                 <h2>Generate Certificates</h2>
             </div>
-            <div class="step-body">
-                <div id="summary" class="summary-box"></div>
-                <button id="generate-btn" class="generate-btn" onclick="generateCertificates()">
-                    Generate Certificates
-                </button>
-                <div id="progress" class="progress-box hidden">
+            <div class="card-body">
+                <div id="summary" class="summary"></div>
+                <button id="generate-btn" class="btn btn-generate" onclick="generateCertificates()">Generate Certificates</button>
+                <div id="progress" class="loading hidden">
                     <div class="spinner"></div>
                     <span>Generating certificates...</span>
                 </div>
             </div>
         </section>
 
-        <!-- Step 5: Download -->
-        <section class="step disabled" id="step-5">
-            <div class="step-header">
-                <span class="step-number">5</span>
+        <!-- Step 5 -->
+        <section class="card disabled" id="step-5">
+            <div class="card-header">
+                <div class="step-badge">5</div>
                 <h2>Download</h2>
             </div>
-            <div class="step-body">
-                <div id="generation-result" class="result-box"></div>
-                <a id="download-link" class="download-btn hidden" href="#">
-                    Download Certificates (ZIP)
-                </a>
+            <div class="card-body">
+                <div id="generation-result" class="result"></div>
+                <a id="download-link" class="btn btn-download hidden" href="#">Download Certificates (ZIP)</a>
             </div>
         </section>
 
-        <div class="footer">
-            StunTronics LLC &middot; Training Division &middot; Certificate Generator
-        </div>
-    </div>
+    </main>
 
-    <!-- Error Display -->
-    <div id="error-banner" class="error-banner hidden"></div>
+    <footer class="footer">StunTronics LLC</footer>
+
+    <div id="error-banner" class="toast hidden"></div>
 
     <script src="/static/app.js"></script>
 </body>
