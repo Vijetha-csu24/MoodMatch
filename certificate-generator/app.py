@@ -91,11 +91,12 @@ def upload_data():
     if not file.filename.endswith((".xlsx", ".xls", ".csv")):
         return jsonify({"error": "File must be .xlsx, .xls, or .csv"}), 400
 
-    data_path = job_dir / "data.xlsx"
+    ext = Path(file.filename).suffix.lower()
+    data_path = job_dir / f"data{ext}"
     file.save(str(data_path))
 
     try:
-        if file.filename.endswith(".csv"):
+        if ext == ".csv":
             df = pd.read_csv(str(data_path))
         else:
             df = pd.read_excel(str(data_path))
@@ -137,13 +138,19 @@ def generate():
 
     job_dir = UPLOAD_DIR / job_id
     template_path = job_dir / "template.docx"
-    data_path = job_dir / "data.xlsx"
 
-    if not template_path.exists() or not data_path.exists():
+    data_path = None
+    for ext in (".xlsx", ".xls", ".csv"):
+        candidate = job_dir / f"data{ext}"
+        if candidate.exists():
+            data_path = candidate
+            break
+
+    if not template_path.exists() or not data_path:
         return jsonify({"error": "Template or data file missing. Re-upload."}), 400
 
     try:
-        if str(data_path).endswith(".csv"):
+        if data_path.suffix == ".csv":
             df = pd.read_csv(str(data_path))
         else:
             df = pd.read_excel(str(data_path))

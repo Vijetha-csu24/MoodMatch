@@ -193,6 +193,19 @@ COMPUTED_FIELDS = {
     "expiration_date": "Auto-calculated from award_date + 2 years",
 }
 
+COLUMN_ALIASES = {
+    "first_name": ["fname", "firstname", "first", "f_name"],
+    "last_name": ["lname", "lastname", "last", "l_name", "surname"],
+    "award_date": ["date", "awarddate", "award", "cert_date", "certdate", "training_date", "trainingdate"],
+    "cert_number": ["certno", "certnumber", "cert_no", "cert_num", "certnum", "certificate_number", "certificatenumber", "number", "no"],
+    "instructor_name": ["instructor", "instructorname", "trainer", "trainer_name"],
+}
+
+_ALIAS_LOOKUP = {}
+for _placeholder, _aliases in COLUMN_ALIASES.items():
+    for _alias in _aliases:
+        _ALIAS_LOOKUP[_alias] = _placeholder
+
 
 def auto_match_columns(excel_columns, placeholders):
     """
@@ -210,6 +223,12 @@ def auto_match_columns(excel_columns, placeholders):
             matches[ph] = "__computed__"
         elif ph_norm in normalized_excel:
             matches[ph] = normalized_excel[ph_norm]
+        else:
+            for excel_norm, excel_orig in normalized_excel.items():
+                resolved = _ALIAS_LOOKUP.get(excel_norm)
+                if resolved == ph_norm:
+                    matches[ph] = excel_orig
+                    break
 
     return matches
 
