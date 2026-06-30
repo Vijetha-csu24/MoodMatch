@@ -20,6 +20,8 @@ from flask import Flask, request, jsonify, send_file, render_template
 from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, apply_document_protection, render_placeholders
 from business_rules import (
     CERT_TYPES,
+    COMPUTED_FIELDS,
+    _ALIAS_LOOKUP,
     build_context,
     build_filename,
     auto_match_columns,
@@ -113,13 +115,26 @@ def upload_data():
 
     template_path = job_dir / "template.docx"
     placeholders = extract_placeholders_from_docx(str(template_path))
-    matches = auto_match_columns(columns, placeholders)
+    internal_matches = auto_match_columns(columns, placeholders)
+
+    ui_matches = {}
+    for ph in placeholders:
+        ph_norm = normalize_column_name(ph)
+        if ph_norm in COMPUTED_FIELDS:
+            ui_matches[ph] = "__computed__"
+        else:
+            resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+            if resolved in internal_matches:
+                ui_matches[ph] = internal_matches[resolved]
+            elif ph in internal_matches:
+                ui_matches[ph] = internal_matches[ph]
 
     return jsonify({
         "columns": columns,
         "row_count": row_count,
         "placeholders": placeholders,
-        "auto_matches": matches,
+        "auto_matches": ui_matches,
+        "internal_matches": internal_matches,
         "message": f"Found {row_count} row(s) and {len(columns)} column(s)",
     })
 

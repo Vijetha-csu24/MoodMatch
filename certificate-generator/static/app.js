@@ -6,6 +6,7 @@ let state = {
     rowCount: 0,
     autoMatches: {},
     columnMapping: {},
+    internalMapping: {},
 };
 
 // --- Step 1: Certificate Type ---
@@ -102,6 +103,7 @@ document.getElementById("data-file").addEventListener("change", function () {
             state.rowCount = data.row_count;
             state.autoMatches = data.auto_matches;
             state.columnMapping = { ...data.auto_matches };
+            state.internalMapping = data.internal_matches || {};
 
             const resultBox = document.getElementById("mapping-result");
             let tableRows = state.placeholders
@@ -205,7 +207,7 @@ function generateCertificates() {
             job_id: state.jobId,
             cert_type: state.certType,
             column_mapping: Object.fromEntries(
-                Object.entries(state.columnMapping).filter(([_, v]) => v !== "__computed__")
+                Object.entries(state.internalMapping).filter(([_, v]) => v !== "__computed__")
             ),
         }),
     })
