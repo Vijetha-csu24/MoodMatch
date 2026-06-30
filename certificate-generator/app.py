@@ -17,7 +17,7 @@ import pandas as pd
 from flask import Flask, request, jsonify, send_file, render_template
 
 
-from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, apply_document_protection, render_placeholders
+from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, render_and_protect
 from business_rules import (
     CERT_TYPES,
     COMPUTED_FIELDS,
@@ -228,13 +228,11 @@ def generate():
                 if resolved in context:
                     render_context[ph] = context[resolved]
 
-            doc_bytes = render_placeholders(fixed_template_bytes, render_context)
-
-            protected_bytes = apply_document_protection(doc_bytes)
+            doc_bytes = render_and_protect(fixed_template_bytes, render_context)
 
             output_path = output_job_dir / filename
             with open(output_path, "wb") as f:
-                f.write(protected_bytes)
+                f.write(doc_bytes)
 
             generated.append({
                 "filename": filename,

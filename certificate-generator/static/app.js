@@ -242,13 +242,7 @@ function generateCertificates() {
             }
 
             resultBox.innerHTML = `
-                <h3>Generation Complete</h3>
                 <p>Successfully generated <span class="cert-count">${data.total_generated}</span> certificate(s)</p>
-                <ul class="generated-list">
-                    ${data.generated
-                        .map((g) => `<li><strong>${g.filename}</strong> &mdash; ${g.name} (${g.cert_number})</li>`)
-                        .join("")}
-                </ul>
                 ${errorHtml}
             `;
 

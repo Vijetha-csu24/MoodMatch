@@ -71,15 +71,16 @@ def fix_fragmented_placeholders(docx_bytes):
     return buffer_out.getvalue()
 
 
-def render_placeholders(docx_bytes, context):
+def render_and_protect(docx_bytes, context, password="CERTEDIT"):
     """
-    Replace {{placeholder}} tags directly in all XML parts of the docx.
+    Replace {{placeholder}} tags and apply document protection in a single ZIP pass.
 
-    More reliable than docxtpl for templates with textboxes, as it works
-    on the raw XML after fragmentation has been fixed.
+    Combines what were previously two separate ZIP decompress/recompress cycles
+    into one, halving I/O for each certificate generated.
     """
     buffer_in = io.BytesIO(docx_bytes)
     buffer_out = io.BytesIO()
+    password_hash = _hash_password(password)
 
     with zipfile.ZipFile(buffer_in, "r") as zin:
         with zipfile.ZipFile(buffer_out, "w", zipfile.ZIP_DEFLATED) as zout:
@@ -90,26 +91,6 @@ def render_placeholders(docx_bytes, context):
                     for key, value in context.items():
                         text = text.replace("{{" + key + "}}", str(value))
                     data = text.encode("utf-8")
-                zout.writestr(item, data)
-
-    return buffer_out.getvalue()
-
-
-def apply_document_protection(docx_bytes, password="CERTEDIT"):
-    """
-    Apply read-only edit protection to a .docx file.
-
-    Adds <w:documentProtection> to word/settings.xml with the given password.
-    """
-    buffer_in = io.BytesIO(docx_bytes)
-    buffer_out = io.BytesIO()
-
-    password_hash = _hash_password(password)
-
-    with zipfile.ZipFile(buffer_in, "r") as zin:
-        with zipfile.ZipFile(buffer_out, "w", zipfile.ZIP_DEFLATED) as zout:
-            for item in zin.infolist():
-                data = zin.read(item.filename)
                 if item.filename == "word/settings.xml":
                     data = _inject_protection(data, password_hash)
                 zout.writestr(item, data)
