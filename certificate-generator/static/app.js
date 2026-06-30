@@ -265,6 +265,8 @@ function generateCertificates() {
 // --- UI Helpers ---
 function enableStep(n) {
     document.getElementById(`step-${n}`).classList.remove("disabled");
+    const dot = document.getElementById(`dot-${n}`);
+    if (dot) dot.classList.add("active");
 }
 
 function disableStepsFrom(n) {
@@ -272,11 +274,25 @@ function disableStepsFrom(n) {
         const step = document.getElementById(`step-${i}`);
         step.classList.add("disabled");
         step.classList.remove("completed");
+        const dot = document.getElementById(`dot-${i}`);
+        if (dot) {
+            dot.classList.remove("active", "completed");
+        }
+        const line = document.getElementById(`line-${i - 1}`);
+        if (line) line.classList.remove("completed");
     }
 }
 
 function markCompleted(n) {
     document.getElementById(`step-${n}`).classList.add("completed");
+    const dot = document.getElementById(`dot-${n}`);
+    if (dot) {
+        dot.classList.remove("active");
+        dot.classList.add("completed");
+        dot.innerHTML = "✓";
+    }
+    const line = document.getElementById(`line-${n}`);
+    if (line) line.classList.add("completed");
 }
 
 function showError(message) {

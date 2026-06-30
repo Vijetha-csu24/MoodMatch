@@ -3,15 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StunTronics Certificate Generator</title>
+    <title>StunTronics - Certificate Generator</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>StunTronics Certificate Generator</h1>
-            <p class="subtitle">Upload a Word template and Excel data to generate certificates</p>
-        </header>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="navbar-logo">ST</div>
+            <div>
+                <div class="navbar-title">StunTronics</div>
+                <div class="navbar-subtitle">Training Division</div>
+            </div>
+        </div>
+        <span class="navbar-badge">Certificate Generator v1</span>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1>Certificate Generator</h1>
+        <p>Generate professional training certificates from Word templates and Excel data in seconds.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">7</div>
+                <div class="hero-stat-label">Cert Types</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">50+</div>
+                <div class="hero-stat-label">Per Batch</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">Auto</div>
+                <div class="hero-stat-label">Protected</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <!-- Progress Tracker -->
+        <div class="progress-tracker">
+            <div class="progress-step-indicator">
+                <div class="progress-dot active" id="dot-1">1</div>
+            </div>
+            <div class="progress-line" id="line-1"></div>
+            <div class="progress-step-indicator">
+                <div class="progress-dot" id="dot-2">2</div>
+            </div>
+            <div class="progress-line" id="line-2"></div>
+            <div class="progress-step-indicator">
+                <div class="progress-dot" id="dot-3">3</div>
+            </div>
+            <div class="progress-line" id="line-3"></div>
+            <div class="progress-step-indicator">
+                <div class="progress-dot" id="dot-4">4</div>
+            </div>
+            <div class="progress-line" id="line-4"></div>
+            <div class="progress-step-indicator">
+                <div class="progress-dot" id="dot-5">5</div>
+            </div>
+        </div>
 
         <!-- Step 1: Select Certificate Type -->
         <section class="step" id="step-1">
@@ -37,11 +90,11 @@
                 <h2>Upload Word Template</h2>
             </div>
             <div class="step-body">
-                <p class="hint">Upload a .docx file with placeholders like <code>{{first_name}}</code>, <code>{{cert_number}}</code>, etc.</p>
+                <p class="hint">Upload a <code>.docx</code> file with placeholders like <code>{{first_name}}</code>, <code>{{cert_number}}</code>, <code>{{award_date}}</code></p>
                 <div class="upload-area" id="template-upload-area">
                     <input type="file" id="template-file" accept=".docx" hidden>
                     <button class="upload-btn" onclick="document.getElementById('template-file').click()">
-                        Choose Template File
+                        Choose Template
                     </button>
                     <span id="template-filename" class="filename"></span>
                 </div>
@@ -56,7 +109,7 @@
                 <h2>Upload Excel Data</h2>
             </div>
             <div class="step-body">
-                <p class="hint">Upload an .xlsx file with one row per certificate. Column names should match the placeholders.</p>
+                <p class="hint">Upload an <code>.xlsx</code> file with one row per certificate. Column names will be auto-matched to template placeholders.</p>
                 <div class="upload-area" id="data-upload-area">
                     <input type="file" id="data-file" accept=".xlsx,.xls,.csv" hidden>
                     <button class="upload-btn" onclick="document.getElementById('data-file').click()">
@@ -100,9 +153,13 @@
             </div>
         </section>
 
-        <!-- Error Display -->
-        <div id="error-banner" class="error-banner hidden"></div>
+        <div class="footer">
+            StunTronics LLC &middot; Training Division &middot; Certificate Generator
+        </div>
     </div>
+
+    <!-- Error Display -->
+    <div id="error-banner" class="error-banner hidden"></div>
 
     <script src="/static/app.js"></script>
 </body>
