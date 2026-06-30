@@ -220,6 +220,14 @@ def generate():
                     if internal_name in context:
                         render_context[excel_col] = context[internal_name]
 
+            for ph in template_placeholders:
+                if ph in render_context:
+                    continue
+                ph_norm = normalize_column_name(ph)
+                resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+                if resolved in context:
+                    render_context[ph] = context[resolved]
+
             doc_bytes = render_placeholders(fixed_template_bytes, render_context)
 
             protected_bytes = apply_document_protection(doc_bytes)
