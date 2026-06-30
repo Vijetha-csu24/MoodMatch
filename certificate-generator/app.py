@@ -92,6 +92,10 @@ def upload_data():
         return jsonify({"error": "File must be .xlsx, .xls, or .csv"}), 400
 
     ext = Path(file.filename).suffix.lower()
+    for old_ext in (".xlsx", ".xls", ".csv"):
+        old_file = job_dir / f"data{old_ext}"
+        if old_file.exists():
+            old_file.unlink()
     data_path = job_dir / f"data{ext}"
     file.save(str(data_path))
 
