@@ -268,16 +268,20 @@ def generate():
                         render_context[ph] = val_str
 
                 name_val = render_context.get("Name") or render_context.get("name") or ""
-                parts = name_val.strip().split()
-                if len(parts) >= 2:
-                    first, last = parts[0], parts[-1]
-                else:
-                    first, last = name_val, str(i + 1)
+                first_val = render_context.get("FName") or render_context.get("first_name") or ""
+                last_val = render_context.get("LName") or render_context.get("last_name") or ""
+                award_date_val = None
+                for ph, col in placeholder_to_col.items():
+                    ph_norm = normalize_column_name(ph)
+                    resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+                    if resolved == "award_date":
+                        award_date_val = row.get(col, "")
+                        break
                 cert_num = render_context.get("Certno") or render_context.get("cert_number") or ""
-                filename = build_filename(first, last, cert_type_key)
+                filename = build_filename(first_val, last_val, cert_type_key, award_date=award_date_val, name=name_val)
             else:
                 context = build_context(row, cert_type_key)
-                filename = build_filename(row["first_name"], row["last_name"], cert_type_key)
+                filename = build_filename(row["first_name"], row["last_name"], cert_type_key, award_date=row.get("award_date"))
 
                 render_context = dict(context)
                 if column_mapping:

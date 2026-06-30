@@ -125,25 +125,42 @@ def parse_date(date_str):
     raise ValueError(f"Cannot parse date: '{date_str}'")
 
 
-def build_filename(first_name, last_name, cert_type_key):
+def build_filename(first_name, last_name, cert_type_key, award_date=None, name=None):
     """
-    Build output filename following StunTronics convention.
+    Build output filename with name and date.
 
-    Examples: LOWERY_S_SH.docx, MALDONADO_P_INSTR_SH.docx
+    Uses first_name + last_name if available, falls back to combined name.
+    Includes award date when provided.
+    Examples: LOWERY_SCOTT_SH_03262026.docx, REED_JOHN_INSTR_SH_06252026.docx
     """
     config = CERT_TYPES[cert_type_key]
-    last = str(last_name).strip().upper() or "UNKNOWN"
-    first_str = str(first_name).strip().upper() or "X"
-    first_init = first_str[0]
     suffix = config["suffix"]
 
+    first_str = str(first_name).strip().upper() if first_name else ""
+    last_str = str(last_name).strip().upper() if last_name else ""
+
+    if not first_str and not last_str and name:
+        parts = str(name).strip().upper().split()
+        if len(parts) >= 2:
+            first_str, last_str = parts[0], parts[-1]
+        elif parts:
+            last_str = parts[0]
+
+    last_str = last_str or "UNKNOWN"
+    first_str = first_str or "X"
+
+    date_part = ""
+    if award_date:
+        try:
+            dt = parse_date(str(award_date)) if isinstance(award_date, str) else award_date
+            date_part = f"_{dt.strftime('%m%d%Y')}"
+        except (ValueError, TypeError, AttributeError):
+            pass
+
     if config["has_expiration"]:
-        return f"{last}_{first_init}_INSTR_{suffix}.docx"
+        return f"{last_str}_{first_str}_INSTR_{suffix}{date_part}.docx"
 
-    if config["has_instructor"]:
-        return f"{last}_{first_init}_{suffix}.docx"
-
-    return f"{last}_{first_init}_{suffix}.docx"
+    return f"{last_str}_{first_str}_{suffix}{date_part}.docx"
 
 
 def build_context(row, cert_type_key):
