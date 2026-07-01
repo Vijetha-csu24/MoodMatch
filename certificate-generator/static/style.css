@@ -34,15 +34,16 @@ body {
 }
 
 .logo img {
-    height: 72px;
+    height: 100px;
     display: block;
 }
 
 .header-label {
-    font-size: 13px;
-    font-weight: 500;
-    color: #64748b;
+    font-size: 28px;
+    font-weight: 700;
+    color: #1e293b;
     letter-spacing: 0.2px;
+    margin: 0;
 }
 
 /* ===== LAYOUT ===== */
@@ -482,7 +483,7 @@ select:focus {
     }
 
     .header-label {
-        display: none;
+        font-size: 20px;
     }
 
     .container {
