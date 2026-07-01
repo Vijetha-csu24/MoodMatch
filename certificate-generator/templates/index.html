@@ -10,14 +10,15 @@
 
     <header class="header">
         <div class="header-inner">
-            <a href="/" class="logo">
+            <a href="javascript:void(0)" class="logo" onclick="resetWorkflow()">
                 <img src="/static/logo.png" alt="StunTronics LLC">
             </a>
-            <h1 class="header-label">Certificate Generator</h1>
+            <button class="btn btn-reset" onclick="resetWorkflow()">Reset</button>
         </div>
     </header>
 
     <main class="container">
+        <h1 class="page-title">Certificate Generator</h1>
 
         <!-- Progress -->
         <div class="progress-bar">

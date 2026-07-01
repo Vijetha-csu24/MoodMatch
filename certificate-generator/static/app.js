@@ -307,6 +307,26 @@ function markCompleted(n) {
     if (line) line.classList.add("completed");
 }
 
+function resetWorkflow() {
+    state = {
+        jobId: null,
+        certType: null,
+        placeholders: [],
+        columns: [],
+        rowCount: 0,
+        autoMatches: {},
+        columnMapping: {},
+        internalMapping: {},
+    };
+    document.getElementById("cert-type-select").value = "";
+    document.getElementById("cert-type-info").classList.add("hidden");
+    document.getElementById("template-filename").textContent = "";
+    document.getElementById("data-filename").textContent = "";
+    document.getElementById("template-file").value = "";
+    document.getElementById("data-file").value = "";
+    disableStepsFrom(2);
+}
+
 function showError(message) {
     const banner = document.getElementById("error-banner");
     banner.textContent = message;
