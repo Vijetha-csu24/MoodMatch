@@ -20,7 +20,6 @@ from flask import Flask, request, jsonify, send_file, render_template
 from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, render_and_protect
 from business_rules import (
     CERT_TYPES,
-    COMPUTED_FIELDS,
     _ALIAS_LOOKUP,
     _match_field,
     build_filename,
@@ -127,8 +126,6 @@ def upload_data():
             ui_matches[ph] = internal_matches[resolved]
         elif ph in internal_matches:
             ui_matches[ph] = internal_matches[ph]
-        elif ph_norm in COMPUTED_FIELDS:
-            ui_matches[ph] = "__computed__"
 
     return jsonify({
         "columns": columns,
