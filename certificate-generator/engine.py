@@ -71,16 +71,12 @@ def fix_fragmented_placeholders(docx_bytes):
     return buffer_out.getvalue()
 
 
-def render_and_protect(docx_bytes, context, password="CERTEDIT"):
+def render_and_protect(docx_bytes, context, password=None):
     """
-    Replace {{placeholder}} tags and apply document protection in a single ZIP pass.
-
-    Combines what were previously two separate ZIP decompress/recompress cycles
-    into one, halving I/O for each certificate generated.
+    Replace {{placeholder}} tags in a single ZIP pass.
     """
     buffer_in = io.BytesIO(docx_bytes)
     buffer_out = io.BytesIO()
-    password_hash = _hash_password(password)
 
     with zipfile.ZipFile(buffer_in, "r") as zin:
         with zipfile.ZipFile(buffer_out, "w", zipfile.ZIP_DEFLATED) as zout:
@@ -91,8 +87,6 @@ def render_and_protect(docx_bytes, context, password="CERTEDIT"):
                     for key, value in context.items():
                         text = text.replace("{{" + key + "}}", str(value))
                     data = text.encode("utf-8")
-                if item.filename == "word/settings.xml":
-                    data = _inject_protection(data, password_hash)
                 zout.writestr(item, data)
 
     return buffer_out.getvalue()
