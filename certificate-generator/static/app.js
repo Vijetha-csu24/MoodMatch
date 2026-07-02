@@ -1,6 +1,5 @@
 let state = {
     jobId: null,
-    certType: null,
     placeholders: [],
     columns: [],
     rowCount: 0,
@@ -9,19 +8,7 @@ let state = {
     internalMapping: {},
 };
 
-// --- Step 1: Certificate Type ---
-document.getElementById("cert-type-select").addEventListener("change", function () {
-    const val = this.value;
-    state.certType = val;
-
-    if (val) {
-        enableStep(2);
-    } else {
-        disableStepsFrom(2);
-    }
-});
-
-// --- Step 2: Upload Template ---
+// --- Step 1: Upload Template ---
 document.getElementById("template-file").addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
@@ -55,8 +42,8 @@ document.getElementById("template-file").addEventListener("change", function () 
             `;
             resultBox.classList.remove("hidden");
 
-            markCompleted(2);
-            enableStep(3);
+            markCompleted(1);
+            enableStep(2);
         })
         .catch((err) => {
             hideLoading("template-upload-area");
@@ -64,7 +51,7 @@ document.getElementById("template-file").addEventListener("change", function () 
         });
 });
 
-// --- Step 3: Upload Data ---
+// --- Step 2: Upload Data ---
 document.getElementById("data-file").addEventListener("change", function () {
     const file = this.files[0];
     if (!file) return;
@@ -148,8 +135,8 @@ document.getElementById("data-file").addEventListener("change", function () {
             `;
             resultBox.classList.remove("hidden");
 
-            markCompleted(3);
-            enableStep(4);
+            markCompleted(2);
+            enableStep(3);
             updateSummary();
         })
         .catch((err) => {
@@ -173,14 +160,13 @@ function updateSummary() {
     const totalPlaceholders = state.placeholders.length;
 
     summary.innerHTML = `
-        <p><strong>Certificate Type:</strong> ${document.getElementById("cert-type-select").selectedOptions[0].text}</p>
         <p><strong>Rows to Process:</strong> <span class="cert-count">${state.rowCount}</span></p>
         <p><strong>Placeholders Matched:</strong> ${matchedCount} / ${totalPlaceholders}</p>
         <p><strong>Output:</strong> ${state.rowCount} protected .docx files + manifest.xlsx in a ZIP</p>
     `;
 }
 
-// --- Step 4: Generate ---
+// --- Step 3: Generate ---
 function generateCertificates() {
     const btn = document.getElementById("generate-btn");
     const progress = document.getElementById("progress");
@@ -193,7 +179,7 @@ function generateCertificates() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             job_id: state.jobId,
-            cert_type: state.certType,
+            cert_type: "bandit_user",
             column_mapping: Object.fromEntries(
                 Object.entries(state.internalMapping).filter(([_, v]) => v !== "__computed__")
             ),
@@ -213,8 +199,8 @@ function generateCertificates() {
                 return;
             }
 
-            enableStep(5);
-            markCompleted(4);
+            enableStep(4);
+            markCompleted(3);
 
             const resultBox = document.getElementById("generation-result");
             let errorHtml = "";
@@ -237,7 +223,7 @@ function generateCertificates() {
             const downloadLink = document.getElementById("download-link");
             downloadLink.href = `/api/download/${state.jobId}`;
             downloadLink.classList.remove("hidden");
-            markCompleted(5);
+            markCompleted(4);
         })
         .catch((err) => {
             btn.disabled = false;
@@ -254,10 +240,12 @@ function enableStep(n) {
 }
 
 function disableStepsFrom(n) {
-    for (let i = n; i <= 5; i++) {
+    for (let i = n; i <= 4; i++) {
         const step = document.getElementById(`step-${i}`);
-        step.classList.add("disabled");
-        step.classList.remove("completed");
+        if (step) {
+            step.classList.add("disabled");
+            step.classList.remove("completed");
+        }
         const dot = document.getElementById(`dot-${i}`);
         if (dot) {
             dot.classList.remove("active", "completed");

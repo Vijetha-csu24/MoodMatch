@@ -28,38 +28,20 @@
             <div class="prog-step" id="dot-3"><span>3</span></div>
             <div class="prog-line" id="line-3"></div>
             <div class="prog-step" id="dot-4"><span>4</span></div>
-            <div class="prog-line" id="line-4"></div>
-            <div class="prog-step" id="dot-5"><span>5</span></div>
         </div>
 
         <div class="reset-row">
             <button class="btn btn-reset" onclick="resetWorkflow()">Reset</button>
         </div>
 
-        <!-- Step 1 -->
+        <!-- Step 1: Upload Template -->
         <section class="card" id="step-1">
             <div class="card-header">
                 <div class="step-badge">1</div>
-                <h2>Select Certificate Type</h2>
-            </div>
-            <div class="card-body">
-                <select id="cert-type-select">
-                    <option value="">Choose certificate type...</option>
-                    {% for key, config in cert_types.items() %}
-                    <option value="{{ key }}">{{ config.label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </section>
-
-        <!-- Step 2 -->
-        <section class="card disabled" id="step-2">
-            <div class="card-header">
-                <div class="step-badge">2</div>
                 <h2>Upload Word Template</h2>
             </div>
             <div class="card-body">
-                <p class="muted">Upload a <code>.docx</code> file with placeholders like <code>&#123;&#123;first_name&#125;&#125;</code>, <code>&#123;&#123;cert_number&#125;&#125;</code>, <code>&#123;&#123;award_date&#125;&#125;</code></p>
+                <p class="muted">Upload a <code>.docx</code> file with placeholders like <code>&#123;&#123;Name&#125;&#125;</code>, <code>&#123;&#123;Certno&#125;&#125;</code>, <code>&#123;&#123;Date&#125;&#125;</code></p>
                 <div class="file-row" id="template-upload-area">
                     <input type="file" id="template-file" accept=".docx" hidden>
                     <button class="btn btn-primary" onclick="document.getElementById('template-file').click()">Choose Template</button>
@@ -69,10 +51,10 @@
             </div>
         </section>
 
-        <!-- Step 3 -->
-        <section class="card disabled" id="step-3">
+        <!-- Step 2: Upload Data -->
+        <section class="card disabled" id="step-2">
             <div class="card-header">
-                <div class="step-badge">3</div>
+                <div class="step-badge">2</div>
                 <h2>Upload Excel Data</h2>
             </div>
             <div class="card-body">
@@ -86,10 +68,10 @@
             </div>
         </section>
 
-        <!-- Step 4 -->
-        <section class="card disabled" id="step-4">
+        <!-- Step 3: Generate -->
+        <section class="card disabled" id="step-3">
             <div class="card-header">
-                <div class="step-badge">4</div>
+                <div class="step-badge">3</div>
                 <h2>Generate Certificates</h2>
             </div>
             <div class="card-body">
@@ -102,10 +84,10 @@
             </div>
         </section>
 
-        <!-- Step 5 -->
-        <section class="card disabled" id="step-5">
+        <!-- Step 4: Download -->
+        <section class="card disabled" id="step-4">
             <div class="card-header">
-                <div class="step-badge">5</div>
+                <div class="step-badge">4</div>
                 <h2>Download</h2>
             </div>
             <div class="card-body">

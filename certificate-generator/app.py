@@ -171,8 +171,10 @@ def generate():
 
     if not job_id:
         return jsonify({"error": "Missing job_id"}), 400
-    if cert_type_key not in CERT_TYPES:
+    if cert_type_key and cert_type_key not in CERT_TYPES:
         return jsonify({"error": f"Invalid cert_type: {cert_type_key}"}), 400
+    if not cert_type_key:
+        cert_type_key = "bandit_user"
 
     job_dir = UPLOAD_DIR / job_id
     template_path = job_dir / "template.docx"
