@@ -20,6 +20,7 @@ from flask import Flask, request, jsonify, send_file, render_template
 from engine import extract_placeholders_from_docx, fix_fragmented_placeholders, render_and_protect
 from business_rules import (
     CERT_TYPES,
+    COMPUTED_FIELDS,
     _ALIAS_LOOKUP,
     _match_field,
     build_filename,
