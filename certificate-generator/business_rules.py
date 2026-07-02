@@ -11,42 +11,42 @@ from dateutil.relativedelta import relativedelta
 
 CERT_TYPES = {
     "bandit_user": {
-        "label": "Band-It User",
+        "label": "Band-It User Certificate",
         "product": "BAND-IT SYSTEM",
         "suffix": "B",
         "has_instructor": False,
         "has_expiration": False,
     },
     "shield_user": {
-        "label": "Ice Shield User",
+        "label": "Ice Shield User Certificate",
         "product": "ICE SHIELD",
         "suffix": "SH",
         "has_instructor": False,
         "has_expiration": False,
     },
     "bandit_field_user": {
-        "label": "Band-It User (Field Instructor)",
+        "label": "Band-It User Recertification",
         "product": "BAND-IT SYSTEM",
         "suffix": "B",
         "has_instructor": True,
         "has_expiration": False,
     },
     "shield_field_user": {
-        "label": "Ice Shield User (Field Instructor)",
+        "label": "Ice Shield User Recertification",
         "product": "ICE SHIELD",
         "suffix": "SH",
         "has_instructor": True,
         "has_expiration": False,
     },
     "bandit_instructor": {
-        "label": "Band-It Instructor",
+        "label": "User Training",
         "product": "BAND-IT SYSTEM",
         "suffix": "B",
         "has_instructor": True,
         "has_expiration": True,
     },
     "shield_instructor": {
-        "label": "Ice Shield Instructor",
+        "label": "Instructor Training",
         "product": "ICE SHIELD",
         "suffix": "SH",
         "has_instructor": True,
