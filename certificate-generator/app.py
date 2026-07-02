@@ -22,6 +22,7 @@ from business_rules import (
     CERT_TYPES,
     COMPUTED_FIELDS,
     _ALIAS_LOOKUP,
+    _match_field,
     build_context,
     build_filename,
     auto_match_columns,
@@ -53,6 +54,8 @@ def _check_direct_mode(template_placeholders, normalized_excel):
             continue
         resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
         if resolved in normalized_excel:
+            continue
+        if _match_field(ph_norm, normalized_excel) or _match_field(resolved, normalized_excel):
             continue
         if ph_norm in COMPUTED_FIELDS:
             return False
@@ -215,6 +218,10 @@ def generate():
                 resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
                 if resolved in normalized_excel:
                     placeholder_to_col[ph] = normalized_excel[resolved]
+                else:
+                    found = _match_field(ph_norm, normalized_excel) or _match_field(resolved, normalized_excel)
+                    if found:
+                        placeholder_to_col[ph] = found
 
         missing = [ph for ph in template_placeholders if ph not in placeholder_to_col]
         if missing:
