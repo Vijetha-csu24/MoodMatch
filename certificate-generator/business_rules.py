@@ -255,10 +255,13 @@ def auto_match_columns(excel_columns, placeholders):
     all_fields = set(REQUIRED_SOURCE_FIELDS)
     for ph in placeholders:
         ph_norm = normalize_column_name(ph)
-        if ph_norm in COMPUTED_FIELDS:
+        resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+        direct_match = _match_field(ph_norm, normalized_excel) or _match_field(resolved, normalized_excel)
+        if direct_match:
+            all_fields.add(resolved)
+        elif ph_norm in COMPUTED_FIELDS:
             matches[ph] = "__computed__"
         else:
-            resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
             all_fields.add(resolved)
 
     for field in all_fields:

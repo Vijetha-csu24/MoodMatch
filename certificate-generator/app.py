@@ -140,14 +140,13 @@ def upload_data():
     ui_matches = {}
     for ph in placeholders:
         ph_norm = normalize_column_name(ph)
-        if ph_norm in COMPUTED_FIELDS:
+        resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
+        if resolved in internal_matches:
+            ui_matches[ph] = internal_matches[resolved]
+        elif ph in internal_matches:
+            ui_matches[ph] = internal_matches[ph]
+        elif ph_norm in COMPUTED_FIELDS:
             ui_matches[ph] = "__computed__"
-        else:
-            resolved = _ALIAS_LOOKUP.get(ph_norm, ph_norm)
-            if resolved in internal_matches:
-                ui_matches[ph] = internal_matches[resolved]
-            elif ph in internal_matches:
-                ui_matches[ph] = internal_matches[ph]
 
     return jsonify({
         "columns": columns,
