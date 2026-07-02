@@ -296,23 +296,7 @@ function markCompleted(n) {
 }
 
 function resetWorkflow() {
-    state = {
-        jobId: null,
-        certType: null,
-        placeholders: [],
-        columns: [],
-        rowCount: 0,
-        autoMatches: {},
-        columnMapping: {},
-        internalMapping: {},
-    };
-    document.getElementById("cert-type-select").value = "";
-    document.getElementById("cert-type-info").classList.add("hidden");
-    document.getElementById("template-filename").textContent = "";
-    document.getElementById("data-filename").textContent = "";
-    document.getElementById("template-file").value = "";
-    document.getElementById("data-file").value = "";
-    disableStepsFrom(2);
+    window.location.reload();
 }
 
 function showError(message) {
