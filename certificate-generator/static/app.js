@@ -14,21 +14,9 @@ document.getElementById("cert-type-select").addEventListener("change", function 
     const val = this.value;
     state.certType = val;
 
-    const infoBox = document.getElementById("cert-type-info");
     if (val) {
-        fetch("/api/cert-types")
-            .then((r) => r.json())
-            .then((types) => {
-                const t = types[val];
-                let info = `<strong>${t.label}</strong>`;
-                if (t.has_instructor) info += " &mdash; Requires instructor name";
-                if (t.has_expiration) info += " &mdash; Expiration auto-calculated (award + 2 years)";
-                infoBox.innerHTML = info;
-                infoBox.classList.remove("hidden");
-                enableStep(2);
-            });
+        enableStep(2);
     } else {
-        infoBox.classList.add("hidden");
         disableStepsFrom(2);
     }
 });
